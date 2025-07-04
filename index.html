@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstroMachine - Space Time Machine</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: #00ff00;
+            font-family: 'Courier Prime', monospace;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Navigation */
+        .nav-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(0, 17, 0, 0.95);
+            border-bottom: 2px solid #00ff00;
+            padding: 15px 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00ff00;
+            text-shadow: 0 0 10px #00ff00;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-item {
+            cursor: pointer;
+            padding: 10px 15px;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            font-size: 14px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            border: 1px solid #00ff00;
+            background: rgba(0, 255, 0, 0.1);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 3px;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: #00ff00;
+            transition: 0.3s;
+        }
+
+        .mission-control {
+            position: relative;
+            z-index: 10;
+            padding: 20px;
+            min-height: 100vh;
+            padding-top: 100px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border: 2px solid #00ff00;
+            padding: 30px;
+            background: rgba(0, 17, 0, 0.8);
+            box-shadow: 0 0 30px #00ff00;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px #00ff00;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        .header .subtitle {
+            font-size: 1.2em;
+            color: #ffff00;
+            margin-bottom: 15px;
+        }
+
+        .header .description {
+            font-size: 1em;
+            color: #00ff00;
+            opacity: 0.9;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px #00ff00; }
+            to { text-shadow: 0 0 20px #00ff00, 0 0 30px #00ff00; }
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0, 34, 0, 0.6);
+            border: 1px solid #00ff00;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-light {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00ff00;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .control-panel {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .date-controls {
+            border: 2px solid #00ff00;
+            padding: 20px;
+            background: rgba(0, 17, 0, 0.8);
+        }
+
+        .date-input::-webkit-calendar-picker-indicator {
+        background-color: #00ff00;
+        border-radius: 3px;
+        cursor: pointer;
+        padding: 2px;
+        }
+
+.date-input:focus {
+    outline: none;
+    box-shadow: 0 0 10px #00ff00;
+}
+        .date-controls h3 {
+            margin-bottom: 15px;
+            color: #ffff00;
+            text-align: center;
+        }
+
+        .date-input {
+            width: 100%;
+            padding: 12px;
+            background: #000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            font-family: 'Courier Prime', monospace;
+            font-size: 16px;
+            margin-bottom: 15px;
+        }
+
+        .time-jump-btn {
+            width: 100%;
+            padding: 15px;
+            background: #004400;
+            color: #00ff00;
+            border: 2px solid #00ff00;
+            font-family: 'Courier Prime', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .time-jump-btn:hover {
+            background: #006600;
+            box-shadow: 0 0 20px #00ff00;
+            transform: scale(1.02);
+        }
+
+        .terminal {
+            border: 2px solid #00ff00;
+            background: rgba(0, 17, 0, 0.9);
+            padding: 20px;
+            height: 400px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .terminal-content {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .cursor {
+            display: inline-block;
+            background: #00ff00;
+            width: 10px;
+            height: 16px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .event-display {
+            margin-top: 30px;
+            border: 2px solid #00ff00;
+            background: rgba(0, 17, 0, 0.8);
+            padding: 20px;
+            display: none;
+        }
+
+        .event-card {
+            background: rgba(0, 34, 0, 0.6);
+            border: 1px solid #00ff00;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .event-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 255, 0, 0.2);
+        }
+
+        .event-date {
+            color: #ffff00;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .event-title {
+            color: #00ffff;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .event-description {
+            color: #00ff00;
+            line-height: 1.6;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #ffff00;
+        }
+
+        .loading-bar {
+            width: 100%;
+            height: 4px;
+            background: #003300;
+            margin: 10px 0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .loading-progress {
+            height: 100%;
+            background: #00ff00;
+            width: 0%;
+            animation: progress 3s ease-in-out;
+        }
+
+        @keyframes progress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        .error {
+            color: #ff0000;
+            border: 1px solid #ff0000;
+            background: rgba(17, 0, 0, 0.8);
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+            text-align: center;
+        }
+
+        .today-highlight {
+            background: rgba(0, 17, 0, 0.8);
+            border: 2px solid #ffff00;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            animation: highlight-pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes highlight-pulse {
+            0%, 100% { box-shadow: 0 0 15px rgba(255, 255, 0, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(255, 255, 0, 0.6); }
+        }
+
+        .today-highlight h2 {
+            color: #ffff00;
+            margin-bottom: 10px;
+        }
+
+        .today-highlight p {
+            color: #00ff00;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(0, 17, 0, 0.98);
+                flex-direction: column;
+                padding: 20px;
+                border-top: 2px solid #00ff00;
+            }
+
+            .nav-menu.active {
+                display: flex;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .control-panel {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .status-bar {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    
+    <!-- Navigation -->
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <div class="nav-logo">🚀 ASTROMACHINE</div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html" class="nav-item active">Time Machine</a></li>
+                <li><a href="missions.html" class="nav-item">Space Missions</a></li>
+                <li><a href="game.html" class="nav-item">Space Game</a></li>
+                <li><a href="mystery.html" class="nav-item">Mystery</a></li>
+                <li><a href="solar-system.html" class="nav-item">Solar System</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="mission-control">
+        <div class="header">
+            <h1>🛸 SPACE TIME MACHINE 🛸</h1>
+            <p class="subtitle">DISCOVER SPACE HISTORY ON ANY DATE</p>
+            <p class="description">Welcome to AstroMachine - Your portal to space exploration history. Automatically displaying today's space events, or travel to any date to discover what happened in the cosmos.</p>
+        </div>
+
+        <div class="today-highlight" id="todayHighlight">
+            <h2>📅 TODAY IN SPACE HISTORY</h2>
+            <p>Automatically loaded events for <span id="todaysDate"></span></p>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="status-light"></div>
+                <span>TEMPORAL DRIVE: ONLINE</span>
+            </div>
+            <div class="status-item">
+                <div class="status-light"></div>
+                <span>DATABASE: CONNECTED</span>
+            </div>
+            <div class="status-item">
+                <div class="status-light"></div>
+                <span>CHRONOMETER: SYNCHRONIZED</span>
+            </div>
+            <div class="status-item">
+                <div class="status-light"></div>
+                <span>AUTO-SCAN: ACTIVE</span>
+            </div>
+        </div>
+
+        <div class="control-panel">
+            <div class="date-controls">
+                <h3>TEMPORAL COORDINATES</h3>
+                <input type="date" id="dateInput" class="date-input" />
+                <button id="timeJumpBtn" class="time-jump-btn">
+                    INITIATE TIME JUMP
+                </button>
+                <button id="todayBtn" class="time-jump-btn">
+                    TODAY'S EVENTS
+                </button>
+                <button id="randomBtn" class="time-jump-btn">
+                    RANDOM DATE
+                </button>
+            </div>
+
+            <div class="terminal">
+                <div class="terminal-content" id="terminalContent">
+                    <div>ASTROMACHINE v3.0 - INITIALIZED</div>
+                    <div>CONNECTING TO HISTORICAL DATABASE...</div>
+                    <div>TEMPORAL NAVIGATION SYSTEM ONLINE</div>
+                    <div>AUTO-SCANNING TODAY'S EVENTS...</div>
+                    <div><br/>WELCOME TO THE SPACE TIME MACHINE</div>
+                    <div><span class="cursor"></span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div>INITIATING TEMPORAL JUMP...</div>
+            <div class="loading-bar">
+                <div class="loading-progress"></div>
+            </div>
+            <div>SCANNING HISTORICAL RECORDS...</div>
+        </div>
+
+        <div class="error" id="error">
+            TEMPORAL NAVIGATION ERROR: Unable to access historical records for this date.
+        </div>
+
+        <div class="event-display" id="eventDisplay">
+            <h3>📡 HISTORICAL SPACE EVENTS DETECTED 📡</h3>
+            <div id="eventsContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        // Create starfield
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 150; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Navigation hamburger menu
+        document.getElementById('hamburger').addEventListener('click', function() {
+            const navMenu = document.getElementById('navMenu');
+            navMenu.classList.toggle('active');
+        });
+
+        // Expanded space events database
+        // Expanded space events database with more July 5–10 entries and ISRO highlights
+const spaceEvents = {
+    "01-01": [
+        { date: "January 1, 2006", title: "New Horizons Launch", description: "NASA's New Horizons spacecraft launched on its mission to Pluto, beginning humanity's first close-up study of the dwarf planet." },
+        { date: "January 1, 1801", title: "Ceres Discovery", description: "Giuseppe Piazzi discovered Ceres, the first asteroid ever found, marking the beginning of asteroid astronomy." }
+    ],
+    "01-03": [
+        { date: "January 3, 2019", title: "Chang'e 4 Moon Landing", description: "China's Chang'e 4 spacecraft successfully landed on the far side of the Moon, a historic first for lunar exploration." }
+    ],
+    "01-04": [
+        { date: "January 4, 2004", title: "Spirit Mars Landing", description: "NASA's Spirit rover successfully landed on Mars, beginning an extended mission to explore the Red Planet's surface." }
+    ],
+    "01-05": [
+        { date: "January 5, 2005", title: "Deep Impact Launch", description: "NASA launched the Deep Impact mission to study the composition of comet Tempel 1 by impacting it with a copper projectile." }
+    ],
+    "02-01": [
+        { date: "February 1, 2003", title: "Columbia Disaster", description: "Space Shuttle Columbia broke apart during re-entry, resulting in the loss of all seven crew members and leading to major changes in space safety protocols." }
+    ],
+    "02-15": [
+        { date: "February 15, 2017", title: "PSLV-C37 Record", description: "ISRO launched 104 satellites in a single mission aboard PSLV-C37, setting a world record for the most satellites deployed at once." }
+    ],
+    "03-09": [
+        { date: "March 9, 2009", title: "Kepler Launch", description: "NASA's Kepler Space Telescope launched to search for Earth-like exoplanets, revolutionizing our understanding of planetary systems." }
+    ],
+    "04-12": [
+        { date: "April 12, 1961", title: "First Human in Space", description: "Soviet cosmonaut Yuri Gagarin became the first human to journey into outer space, orbiting Earth aboard Vostok 1." },
+        { date: "April 12, 1981", title: "First Space Shuttle Launch", description: "Space Shuttle Columbia launched on STS-1, beginning the era of reusable spacecraft and routine access to space." }
+    ],
+    "05-05": [
+        { date: "May 5, 1961", title: "First American in Space", description: "Alan Shepard became the first American astronaut in space aboard Freedom 7, marking America's entry into human spaceflight." },
+        { date: "May 5, 2023", title: "GSLV-F12/Navigation Launch", description: "ISRO successfully launched GSLV-F12 carrying the NVS-01 navigation satellite, enhancing India's NavIC system." }
+    ],
+    "06-16": [
+        { date: "June 16, 1963", title: "First Woman in Space", description: "Soviet cosmonaut Valentina Tereshkova became the first woman to fly in space aboard Vostok 6." }
+    ],
+    "06-25": [
+        { date: "June 25, 1978", title: "Seasat Launch", description: "NASA launched Seasat, the first satellite designed to study Earth's oceans, pioneering oceanographic research from space." },
+        { date: "June 25, 1997", title: "Progress Collision", description: "An unmanned Progress spacecraft collided with the Mir space station during a docking test, causing significant damage but no casualties." }
+    ],
+    "07-04": [
+        { date: "July 4, 1997", title: "Mars Pathfinder Landing", description: "NASA's Mars Pathfinder successfully landed on Mars, deploying the first Mars rover 'Sojourner' and beginning a new era of Mars exploration." },
+        { date: "July 4, 2005", title: "Deep Impact Collision", description: "NASA's Deep Impact mission successfully collided with comet Tempel 1, creating a spectacular impact visible from Earth and revealing comet composition." }
+    ],
+    "07-05": [
+        { date: "July 5, 2016", title: "Juno Enters Jupiter Orbit", description: "NASA's Juno spacecraft successfully entered orbit around Jupiter, beginning a detailed study of the gas giant’s atmosphere and magnetic field." }
+    ],
+    "07-06": [
+        { date: "July 6, 2014", title: "OCO-2 Enters Orbit", description: "NASA's Orbiting Carbon Observatory-2 was inserted into orbit to study atmospheric CO₂, helping track climate change." }
+    ],
+    "07-07": [
+        { date: "July 7, 2022", title: "PSLV-C53 Launch", description: "ISRO launched PSLV-C53 carrying three Singaporean satellites, demonstrating commercial launch capabilities." }
+    ],
+    "07-08": [
+        { date: "July 8, 2011", title: "Final Space Shuttle Launch", description: "NASA launched Atlantis on STS-135, marking the final flight of the Space Shuttle Program after 30 years." },
+        { date: "July 8, 2015", title: "ISRO GSLV Mk-II GSAT-6A", description: "ISRO conducted a successful test of GSLV Mk-II by launching GSAT-6A, a communication satellite for strategic use." }
+    ],
+    "07-09": [
+        { date: "July 9, 2014", title: "ISRO's SPOT-7 Launch", description: "PSLV-C23 launched SPOT-7 and four other satellites for international customers, highlighting ISRO’s commercial strength." }
+    ],
+    "07-10": [
+        { date: "July 10, 1976", title: "Viking 1 Enters Mars Orbit", description: "NASA's Viking 1 orbiter entered orbit around Mars, preparing for the first successful US Mars landing later that month." }
+    ],
+    "07-14": [
+        { date: "July 14, 2023", title: "Chandrayaan-3 Launch", description: "ISRO launched Chandrayaan-3 to attempt a soft landing on the Moon’s south pole, following up on the Chandrayaan-2 mission." }
+    ],
+    "07-20": [
+        { date: "July 20, 1969", title: "Moon Landing", description: "Apollo 11 astronauts Neil Armstrong and Buzz Aldrin became the first humans to walk on the Moon, fulfilling President Kennedy's goal." }
+    ],
+    "07-22": [
+        { date: "July 22, 2019", title: "Chandrayaan-2 Launch", description: "ISRO launched Chandrayaan-2, India's second lunar exploration mission, carrying an orbiter, lander, and rover." }
+    ],
+    "08-15": [
+        { date: "August 15, 2022", title: "SSLV-D1 Maiden Flight", description: "ISRO conducted the first developmental flight of the SSLV (Small Satellite Launch Vehicle), marking a new era of small payload launches." }
+    ],
+    "08-23": [
+        { date: "August 23, 2023", title: "Chandrayaan-3 Moon Landing", description: "India became the first country to successfully land a spacecraft near the Moon’s south pole with Chandrayaan-3's Vikram lander." }
+    ],
+    "08-25": [
+        { date: "August 25, 1989", title: "Voyager 2 Neptune Flyby", description: "Voyager 2 flew by Neptune, completing the first Grand Tour of the outer solar system and providing our first close-up views of the ice giant." }
+    ],
+    "09-12": [
+        { date: "September 12, 1962", title: "Kennedy Moon Speech", description: "President John F. Kennedy delivered his famous 'We choose to go to the Moon' speech at Rice University, galvanizing American space ambitions." }
+    ],
+    "09-24": [
+        { date: "September 24, 2014", title: "Mangalyaan Enters Mars Orbit", description: "ISRO’s Mars Orbiter Mission (Mangalyaan) successfully entered Martian orbit, making India the first Asian nation to do so." }
+    ],
+    "10-04": [
+        { date: "October 4, 1957", title: "Sputnik Launch", description: "The Soviet Union launched Sputnik 1, the first artificial satellite, beginning the Space Age and the Space Race." }
+    ],
+    "11-20": [
+        { date: "November 20, 1998", title: "ISS First Module", description: "The Zarya module, the first component of the International Space Station, was launched, beginning construction of humanity's permanent outpost in space." }
+    ],
+    "12-21": [
+        { date: "December 21, 1968", title: "Apollo 8 Launch", description: "Apollo 8 launched as the first crewed mission to leave Earth orbit and travel to the Moon, taking the famous 'Earthrise' photograph." }
+    ],
+    "12-25": [
+        { date: "December 25, 2021", title: "James Webb Launch", description: "NASA launched the James Webb Space Telescope aboard Ariane 5, beginning a new era of space-based infrared astronomy." }
+    ]
+};
+
+
+        // Audio simulation (visual feedback)
+        function playSound(type) {
+            const terminal = document.getElementById('terminalContent');
+            const soundIndicator = document.createElement('div');
+            soundIndicator.style.color = '#ffff00';
+            soundIndicator.style.fontSize = '12px';
+            
+            switch(type) {
+                case 'beep':
+                    soundIndicator.textContent = '[BEEP]';
+                    break;
+                case 'confirm':
+                    soundIndicator.textContent = '[CONFIRMATION TONE]';
+                    break;
+                case 'error':
+                    soundIndicator.textContent = '[ERROR ALERT]';
+                    break;
+            }
+            
+            terminal.appendChild(soundIndicator);
+            setTimeout(() => soundIndicator.remove(), 1000);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        // Typing effect
+        function typeText(text, callback) {
+            const terminal = document.getElementById('terminalContent');
+            const cursor = terminal.querySelector('.cursor');
+            
+            if (cursor) cursor.remove();
+            
+            const textDiv = document.createElement('div');
+            terminal.appendChild(textDiv);
+            
+            let i = 0;
+            const typeInterval = setInterval(() => {
+                textDiv.textContent += text[i];
+                i++;
+                if (i >= text.length) {
+                    clearInterval(typeInterval);
+                    const newCursor = document.createElement('span');
+                    newCursor.className = 'cursor';
+                    terminal.appendChild(newCursor);
+                    terminal.scrollTop = terminal.scrollHeight;
+                    if (callback) callback();
+                }
+            }, 30);
+        }
+
+        // Get events for date
+        function getEventsForDate(date) {
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const key = `${month}-${day}`;
+            return spaceEvents[key] || [];
+        }
+
+        // Display events
+        function displayEvents(events, date) {
+            const eventsContainer = document.getElementById('eventsContainer');
+            const eventDisplay = document.getElementById('eventDisplay');
+            
+            eventsContainer.innerHTML = '';
+            
+            if (events.length === 0) {
+                const noEventsCard = document.createElement('div');
+                noEventsCard.className = 'event-card';
+                noEventsCard.innerHTML = `
+                    <div class="event-date">${date.toLocaleDateString()}</div>
+                    <div class="event-title">No Major Space Events Recorded</div>
+                    <div class="event-description">Our temporal database shows no significant space events for this date. The cosmos was quiet, but the universe continued its eternal dance among the stars.</div>
+                `;
+                eventsContainer.appendChild(noEventsCard);
+            } else {
+                events.forEach(event => {
+                    const eventCard = document.createElement('div');
+                    eventCard.className = 'event-card';
+                    eventCard.innerHTML = `
+                        <div class="event-date">${event.date}</div>
+                        <div class="event-title">${event.title}</div>
+                        <div class="event-description">${event.description}</div>
+                    `;
+                    eventsContainer.appendChild(eventCard);
+                });
+            }
+            
+            eventDisplay.style.display = 'block';
+            eventDisplay.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Random date generator
+        function getRandomDate() {
+            const start = new Date(1957, 9, 4); // Sputnik launch
+            const end = new Date();
+            const randomDate = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+            return randomDate;
+        }
+
+
+        function validateDateRange(date) {
+        const minDate = new Date(1957, 9, 4); // Sputnik launch
+        const maxDate = new Date();
+        
+        if (date < minDate || date > maxDate) {
+            return false; 
+        }
+        return true;
+        }
+
+        // Time jump function
+        function initiateTimeJump() {
+            const dateInput = document.getElementById('dateInput');
+            const loading = document.getElementById('loading');
+            const error = document.getElementById('error');
+            const eventDisplay = document.getElementById('eventDisplay');
+            
+            if (!dateInput.value) {
+                playSound('error');
+                typeText('ERROR: TEMPORAL COORDINATES NOT SET. PLEASE SELECT A DATE.');
+                error.style.display = 'block';
+                setTimeout(() => error.style.display = 'none', 3000);
+                return;
+            }
+            
+            const selectedDate = new Date(dateInput.value);
+
+            if (!validateDateRange(selectedDate)) {
+    playSound('error');
+    typeText('ERROR: DATE OUT OF RANGE. PLEASE SELECT DATE BETWEEN 1957-2025.');
+    error.style.display = 'block';
+    setTimeout(() => error.style.display = 'none', 3000);
+    return;
+}
+            
+            playSound('beep');
+            typeText('INITIATING TEMPORAL JUMP SEQUENCE...');
+            
+            loading.style.display = 'block';
+            eventDisplay.style.display = 'none';
+            error.style.display = 'none';
+            
+            setTimeout(() => {
+                typeText(`TEMPORAL COORDINATES LOCKED: ${selectedDate.toLocaleDateString()}`);
+                
+                setTimeout(() => {
+                    typeText('SCANNING HISTORICAL DATABASE...');
+                    
+                    setTimeout(() => {
+                        const events = getEventsForDate(selectedDate);
+                        
+                        loading.style.display = 'none';
+                        playSound('confirm');
+                        
+                        if (events.length > 0) {
+                            typeText(`TIME JUMP SUCCESSFUL! ${events.length} EVENT(S) DETECTED.`);
+                        } else {
+                            typeText('TIME JUMP COMPLETE. NO MAJOR EVENTS DETECTED FOR THIS DATE.');
+                        }
+                        
+                        setTimeout(() => {
+                            displayEvents(events, selectedDate);
+                        }, 1000);
+                        
+                    }, 1500);
+                }, 1000);
+            }, 1000);
+        }
+
+        // Today's events
+        function showTodaysEvents() {
+            const today = new Date();
+            document.getElementById('dateInput').value = today.toISOString().split('T')[0];
+            document.getElementById('todaysDate').textContent = today.toLocaleDateString();
+            initiateTimeJump();
+        }
+
+        // Random date function
+        function showRandomDate() {
+            const randomDate = getRandomDate();
+            document.getElementById('dateInput').value = randomDate.toISOString().split('T')[0];
+            playSound('beep');
+            typeText(`RANDOM DATE SELECTED: ${randomDate.toLocaleDateString()}`);
+            setTimeout(() => {
+                initiateTimeJump();
+            }, 1000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            createStars();
+            
+            // Set today's date as default
+            const today = new Date();
+            document.getElementById('dateInput').value = today.toISOString().split('T')[0];
+            document.getElementById('todaysDate').textContent = today.toLocaleDateString();
+            
+            // Event listeners
+            document.getElementById('timeJumpBtn').addEventListener('click', initiateTimeJump);
+            document.getElementById('todayBtn').addEventListener('click', showTodaysEvents);
+            document.getElementById('randomBtn').addEventListener('click', showRandomDate);
+            
+            // Enter key support
+            document.getElementById('dateInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    initiateTimeJump();
+                }
+            });
+            
+            // Auto-show today's events on load
+            setTimeout(() => {
+                typeText('AUTO-SCAN COMPLETE. DISPLAYING TODAY\'S EVENTS...');
+                setTimeout(showTodaysEvents, 1000);
+            }, 2000);
+        });
+    </script>
+</body>
+</html>
