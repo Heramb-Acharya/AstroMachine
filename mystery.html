@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planet Speed Game - AstroMachine</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: #00ff00;
+            font-family: 'Courier Prime', monospace;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Navigation */
+        .nav-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(0, 17, 0, 0.95);
+            border-bottom: 2px solid #00ff00;
+            padding: 15px 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00ff00;
+            text-shadow: 0 0 10px #00ff00;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-item {
+            cursor: pointer;
+            padding: 10px 15px;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            font-size: 14px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            border: 1px solid #00ff00;
+            background: rgba(0, 255, 0, 0.1);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 3px;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: #00ff00;
+            transition: 0.3s;
+        }
+
+        .mission-control {
+            position: relative;
+            z-index: 10;
+            padding: 20px;
+            min-height: 100vh;
+            padding-top: 100px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border: 2px solid #00ff00;
+            padding: 30px;
+            background: rgba(0, 17, 0, 0.8);
+            box-shadow: 0 0 30px #00ff00;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px #00ff00;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        .header .subtitle {
+            font-size: 1.2em;
+            color: #ffff00;
+            margin-bottom: 15px;
+        }
+
+        .header .description {
+            font-size: 1em;
+            color: #00ff00;
+            opacity: 0.9;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px #00ff00; }
+            to { text-shadow: 0 0 20px #00ff00, 0 0 30px #00ff00; }
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0, 34, 0, 0.6);
+            border: 1px solid #00ff00;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-light {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00ff00;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .control-panel {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .speed-controls {
+            border: 2px solid #00ff00;
+            padding: 20px;
+            background: rgba(0, 17, 0, 0.8);
+        }
+
+        .speed-controls h3 {
+            margin-bottom: 15px;
+            color: #ffff00;
+            text-align: center;
+        }
+
+        .speed-input {
+            width: 100%;
+            padding: 12px;
+            background: #000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            font-family: 'Courier Prime', monospace;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .speed-input:focus {
+            outline: none;
+            box-shadow: 0 0 10px #00ff00;
+        }
+
+        .unit-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .unit-btn {
+            flex: 1;
+            padding: 10px;
+            background: #002200;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            font-family: 'Courier Prime', monospace;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .unit-btn.active {
+            background: #004400;
+            box-shadow: 0 0 10px #00ff00;
+        }
+
+        .calculate-btn {
+            width: 100%;
+            padding: 15px;
+            background: #004400;
+            color: #00ff00;
+            border: 2px solid #00ff00;
+            font-family: 'Courier Prime', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .calculate-btn:hover {
+            background: #006600;
+            box-shadow: 0 0 20px #00ff00;
+            transform: scale(1.02);
+        }
+
+        .terminal {
+            border: 2px solid #00ff00;
+            background: rgba(0, 17, 0, 0.9);
+            padding: 20px;
+            height: 400px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .terminal-content {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .cursor {
+            display: inline-block;
+            background: #00ff00;
+            width: 10px;
+            height: 16px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .preset-speeds {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .preset-btn {
+            padding: 8px 12px;
+            background: #002200;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            font-family: 'Courier Prime', monospace;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .preset-btn:hover {
+            background: #004400;
+            box-shadow: 0 0 10px #00ff00;
+        }
+
+        .error {
+            color: #ff0000;
+            border: 1px solid #ff0000;
+            background: rgba(17, 0, 0, 0.8);
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+            text-align: center;
+        }
+
+        /* 3D Planet Gallery Styles */
+        -gallery {
+            margin-top: 40px;
+            padding: 30px;
+            border: 2px solid #00ff00;
+            background: rgba(0, 17, 0, 0.8);
+            box-shadow: 0 0 30px rgba(0, 255, 0, 0.3);
+        }
+
+        .galaxy-title {
+            text-align: center;
+            font-size: 2.5em;
+            color: #00ff00;
+            text-shadow: 0 0 .planet20px #00ff00;
+            margin-bottom: 20px;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        .galaxy-subtitle {
+            text-align: center;
+            color: #ffff00;
+            font-size: 1.2em;
+            margin-bottom: 40px;
+        }
+
+        .planets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            justify-items: center;
+            margin-bottom: 40px;
+        }
+
+        .planet-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .planet-container:hover {
+            transform: translateY(-10px);
+        }
+
+   /* Replace the existing .planet class and all individual planet styles with these improved versions */
+
+.planet {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    position: relative;
+    transition: all 0.3s ease;
+    /* Remove the rotation animation for better 3D effect */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    background-size: cover;
+    background-position: center;
+    overflow: hidden;
+}
+
+.planet::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 25% 25%, rgba(255, 255, 255, 0.3) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 2;
+}
+
+.planet::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 75% 75%, rgba(0, 0, 0, 0.4) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 3;
+}
+
+.planet-container:hover .planet {
+    transform: scale(1.1);
+    box-shadow: 0 0 40px rgba(255, 255, 255, 0.3);
+}
+
+/* Individual Planet Styles - Replace all existing planet styles */
+.planet.mercury {
+    background: radial-gradient(circle at 30% 30%, #8C7853 0%, #5A4A3A 30%, #3A3A3A 60%, #1A1A1A 100%);
+    box-shadow: 
+        inset -15px -15px 30px rgba(0, 0, 0, 0.8),
+        inset 10px 10px 20px rgba(140, 120, 83, 0.3),
+        0 0 30px rgba(140, 120, 83, 0.2);
+}
+
+.planet.venus {
+    background: radial-gradient(circle at 30% 30%, #FFC649 0%, #FFB347 20%, #FF8C00 50%, #CC6600 80%, #996600 100%);
+    box-shadow: 
+        inset -15px -15px 30px rgba(0, 0, 0, 0.6),
+        inset 10px 10px 20px rgba(255, 198, 73, 0.4),
+        0 0 30px rgba(255, 198, 73, 0.3);
+}
+
+.planet.earth {
+    background: radial-gradient(circle at 30% 30%, #87CEEB 0%, #6B93D6 20%, #4A90E2 40%, #2E86AB 60%, #1A5490 80%, #0F3460 100%);
+    box-shadow: 
+        inset -15px -15px 30px rgba(0, 0, 0, 0.6),
+        inset 10px 10px 20px rgba(107, 147, 214, 0.4),
+        0 0 30px rgba(107, 147, 214, 0.3);
+}
+
+.planet.earth::before {
+    background: radial-gradient(ellipse at 25% 25%, rgba(255, 255, 255, 0.4) 0%, transparent 50%);
+}
+
+.planet.mars {
+    background: radial-gradient(circle at 30% 30%, #CD853F 0%, #CD5C5C 20%, #A0522D 40%, #8B0000 60%, #800000 80%, #4B0000 100%);
+    box-shadow: 
+        inset -15px -15px 30px rgba(0, 0, 0, 0.7),
+        inset 10px 10px 20px rgba(205, 92, 92, 0.4),
+        0 0 30px rgba(205, 92, 92, 0.3);
+}
+
+.planet.jupiter {
+    background: 
+        radial-gradient(circle at 30% 30%, #DEB887 0%, #D2691E 20%, #CD853F 40%, #B8860B 60%, #8B4513 80%, #654321 100%),
+        linear-gradient(0deg, transparent 35%, rgba(139, 69, 19, 0.4) 40%, rgba(139, 69, 19, 0.4) 45%, transparent 50%, transparent 55%, rgba(160, 82, 45, 0.4) 60%, rgba(160, 82, 45, 0.4) 65%, transparent 70%);
+    box-shadow: 
+        inset -15px -15px 30px rgba(0, 0, 0, 0.7),
+        inset 10px 10px 20px rgba(210, 105, 30, 0.4),
+        0 0 30px rgba(210, 105, 30, 0.3);
+}
+
+.planet.saturn {
+    background: radial-gradient(circle at 30% 30%, #FAD5A5 0%, #F4A460 20%, #DEB887 40%, #D2B48C 60%, #CD853F 80%, #B8860B 100%);
+    box-shadow: 
+        inset -15px -15px 30px rgba(0, 0, 0, 0.6),
+        inset 10px 10px 20px rgba(250, 213, 165, 0.4),
+        0 0 30px rgba(250, 213, 165, 0.3);
+}
+
+.planet.saturn::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 180px;
+    height: 180px;
+    border: 3px solid rgba(250, 213, 165, 0.8);
+    border-radius: 50%;
+    transform: translate(-50%, -50%) rotateX(70deg);
+    pointer-events: none;
+    box-shadow: 0 0 20px rgba(250, 213, 165, 0.4);
+    z-index: 4;
+}
+
+.planet.uranus {
+    background: radial-gradient(circle at 30% 30%, #87CEEB 0%, #4FD0E3 20%, #40E0D0 40%, #20B2AA 60%, #008B8B 80%, #005A5A 100%);
+    box-shadow: 
+        inset -15px -15px 30px rgba(0, 0, 0, 0.6),
+        inset 10px 10px 20px rgba(79, 208, 227, 0.4),
+        0 0 30px rgba(79, 208, 227, 0.3);
+}
+
+.planet.neptune {
+    background: radial-gradient(circle at 30% 30%, #6495ED 0%, #4169E1 20%, #0000FF 40%, #0000CD 60%, #000080 80%, #000040 100%);
+    box-shadow: 
+        inset -15px -15px 30px rgba(0, 0, 0, 0.7),
+        inset 10px 10px 20px rgba(65, 105, 225, 0.4),
+        0 0 30px rgba(65, 105, 225, 0.3);
+}
+
+.planet.moon {
+    background: radial-gradient(circle at 30% 30%, #F5F5F5 0%, #C0C0C0 20%, #A9A9A9 40%, #808080 60%, #696969 80%, #2F2F2F 100%);
+    box-shadow: 
+        inset -15px -15px 30px rgba(0, 0, 0, 0.8),
+        inset 10px 10px 20px rgba(192, 192, 192, 0.3),
+        0 0 30px rgba(192, 192, 192, 0.2);
+}
+
+/* Add crater effects for Moon */
+.planet.moon::before {
+    background: radial-gradient(ellipse at 25% 25%, rgba(255, 255, 255, 0.3) 0%, transparent 30%),
+                radial-gradient(ellipse at 60% 40%, rgba(105, 105, 105, 0.6) 0%, transparent 15%),
+                radial-gradient(ellipse at 70% 70%, rgba(105, 105, 105, 0.4) 0%, transparent 12%),
+                radial-gradient(ellipse at 30% 80%, rgba(105, 105, 105, 0.5) 0%, transparent 10%);
+}
+
+.planet.pluto {
+    background: radial-gradient(circle at 30% 30%, #D2B48C 0%, #BC9A6A 20%, #8B7355 40%, #6B5B47 60%, #5D4037 80%, #3E2723 100%);
+    box-shadow: 
+        inset -15px -15px 30px rgba(0, 0, 0, 0.8),
+        inset 10px 10px 20px rgba(210, 180, 140, 0.3),
+        0 0 30px rgba(210, 180, 140, 0.2);
+}
+
+/* Remove the rotation animation completely */
+@keyframes rotate {
+    0% { transform: rotateY(0deg); }
+    100% { transform: rotateY(360deg); }
+}
+
+/* Remove rotation from planet-container active state */
+.planet-container.active .planet {
+    box-shadow: 0 0 60px rgba(0, 255, 0, 0.8);
+}
+
+        .instruction-panel {
+            text-align: center;
+            background: rgba(0, 34, 0, 0.6);
+            border: 1px solid #00ff00;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 10px;
+        }
+
+        .instruction-text {
+            color: #ffff00;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+
+        .instruction-subtext {
+            color: #00ff00;
+            font-size: 0.9em;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(0, 17, 0, 0.98);
+                flex-direction: column;
+                padding: 20px;
+                border-top: 2px solid #00ff00;
+            }
+
+            .nav-menu.active {
+                display: flex;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .control-panel {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .status-bar {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .preset-speeds {
+                flex-direction: column;
+            }
+
+            .preset-btn {
+                width: 100%;
+            }
+
+            .planets-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+                gap: 30px;
+            }
+
+            .planet {
+                width: 100px;
+                height: 100px;
+            }
+
+            .galaxy-title {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    
+    <!-- Navigation -->
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <div class="nav-logo">🚀 ASTROMACHINE</div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html" class="nav-item">Time Machine</a></li>
+                <li><a href="missions.html" class="nav-item">Space Missions</a></li>
+                <li><a href="planetspeed.html" class="nav-item active">Planet Speed Game</a></li>
+                <li><a href="live-data.html" class="nav-item">Live Data</a></li>
+                <li><a href="solar-system.html" class="nav-item">Solar System</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="mission-control">
+        <div class="header">
+            <h1>🏃‍♂️ PLANET SPEED GAME 🏃‍♂️</h1>
+            <p class="subtitle">DISCOVER HOW FAST YOU CAN RUN ACROSS THE SOLAR SYSTEM</p>
+            <p class="description">Experience the thrill of superhuman speed! Input your running speed and click on any planet to see how gravity affects your performance.</p>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="status-light"></div>
+                <span>3D PLANET RENDERER: ONLINE</span>
+            </div>
+            <div class="status-item">
+                <div class="status-light"></div>
+                <span>GRAVITY SIMULATOR: CALIBRATED</span>
+            </div>
+            <div class="status-item">
+                <div class="status-light"></div>
+                <span>PHYSICS ENGINE: READY</span>
+            </div>
+            <div class="status-item">
+                <div class="status-light"></div>
+                <span>SPEED CALCULATOR: ARMED</span>
+            </div>
+        </div>
+
+        <div class="control-panel">
+            <div class="speed-controls">
+                <h3>SPEED INPUT CONSOLE</h3>
+                
+                <div class="preset-speeds">
+                    <button class="preset-btn" onclick="setSpeed(5)">Walking (5 mph)</button>
+                    <button class="preset-btn" onclick="setSpeed(10)">Jogging (10 mph)</button>
+                    <button class="preset-btn" onclick="setSpeed(15)">Running (15 mph)</button>
+                    <button class="preset-btn" onclick="setSpeed(28)">Usain Bolt (28 mph)</button>
+                </div>
+
+                <input type="number" id="speedInput" class="speed-input" placeholder="Enter your speed" min="0" max="100" step="0.1" />
+                
+                <div class="unit-selector">
+                    <button class="unit-btn active" onclick="selectUnit('mph')">MPH</button>
+                    <button class="unit-btn" onclick="selectUnit('kph')">KPH</button>
+                    <button class="unit-btn" onclick="selectUnit('ms')">M/S</button>
+                </div>
+
+                <button id="randomBtn" class="calculate-btn">
+                    RANDOM SPEED TEST
+                </button>
+            </div>
+
+            <div class="terminal">
+                <div class="terminal-content" id="terminalContent">
+                    <div>PLANET SPEED GAME v3.0 - 3D EDITION</div>
+                    <div>LOADING 3D PLANET RENDERER...</div>
+                    <div>GRAVITY SIMULATION ONLINE</div>
+                    <div>PHYSICS ENGINE CALIBRATED</div>
+                    <div><br/>ENTER YOUR SPEED AND CLICK ANY PLANET</div>
+                    <div><span class="cursor"></span></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="error" id="error">
+            SPEED CALCULATION ERROR: Please enter a valid speed value.
+        </div>
+
+        <div class="planet-gallery">
+            <div class="galaxy-title">🌌 INTERACTIVE SOLAR SYSTEM 🌌</div>
+            <div class="galaxy-subtitle">Click on any planet to see your speed!</div>
+            
+            <div class="planets-grid" id="planetsGrid">
+                <!-- Planets will be dynamically generated here -->
+            </div>
+
+            <div class="instruction-panel">
+                <div class="instruction-text">⚡ ENTER YOUR SPEED ABOVE AND CLICK ANY PLANET ⚡</div>
+                <div class="instruction-subtext">Watch as gravity transforms your running speed across different worlds!</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create starfield
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 150; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Navigation hamburger menu
+        document.getElementById('hamburger').addEventListener('click', function() {
+            const navMenu = document.getElementById('navMenu');
+            navMenu.classList.toggle('active');
+        });
+
+        // Planetary data with gravity and interesting facts
+        const planets = [
+            {
+                name: "Mercury",
+                gravity: 0.378,
+                emoji: "☿️",
+                fact: "You'd run so fast you might escape orbit!",
+                cssClass: "mercury"
+            },
+            {
+                name: "Venus",
+                gravity: 0.907,
+                emoji: "♀️",
+                fact: "Almost like Earth, but you'd melt instantly!",
+                cssClass: "venus"
+            },
+            {
+                name: "Earth",
+                gravity: 1.0,
+                emoji: "🌍",
+                fact: "Your home planet baseline speed!",
+                cssClass: "earth"
+            },
+            {
+                name: "Mars",
+                gravity: 0.377,
+                emoji: "🔴",
+                fact: "Perfect for superhuman running!",
+                cssClass: "mars"
+            },
+            {
+                name: "Jupiter",
+                gravity: 2.36,
+                emoji: "🪐",
+                fact: "You'd feel like running in molasses!",
+                cssClass: "jupiter"
+            },
+            {
+                name: "Saturn",
+                gravity: 0.916,
+                emoji: "🪐",
+                fact: "Almost Earth-like, but with amazing rings!",
+                cssClass: "saturn"
+            },
+            {
+                name: "Uranus",
+                gravity: 0.889,
+                emoji: "🌀",
+                fact: "Running sideways on this tilted world!",
+                cssClass: "uranus"
+            },
+            {
+                name: "Neptune",
+                gravity: 1.13,
+                emoji: "🔵",
+                fact: "Slightly harder than Earth, with diamond rain!",
+                cssClass: "neptune"
+            },
+            {
+                name: "Moon",
+                gravity: 0.166,
+                emoji: "🌙",
+                fact: "You'd practically fly with each step!",
+                cssClass: "moon"
+            },
+            {
+                name: "Pluto",
+                gravity: 0.071,
+                emoji: "🪐",
+                fact: "You'd launch yourself into space!",
+                cssClass: "pluto"
+            }
+        ];
+
+        let currentUnit = 'mph';
+        let currentSpeed = 0;
+
+        // Audio simulation (visual feedback)
+        function playSound(type) {
+            const terminal = document.getElementById('terminalContent');
+            const soundIndicator = document.createElement('div');
+            soundIndicator.style.color = '#ffff00';
+            soundIndicator.style.fontSize = '12px';
+            
+            switch(type) {
+                case 'beep':
+                    soundIndicator.textContent = '[BEEP]';
+                    break;
+                case 'confirm':
+                    soundIndicator.textContent = '[CALCULATION COMPLETE]';
+                    break;
+                case 'error':
+                    soundIndicator.textContent = '[ERROR ALERT]';
+                    break;
+                case 'planet':
+                    soundIndicator.textContent = '[PLANET SELECTED]';
+                    break;
+            }
+            
+            terminal.appendChild(soundIndicator);
+            setTimeout(() => soundIndicator.remove(), 1000);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        // Typing effect
+        function typeText(text, callback) {
+            const terminal = document.getElementById('terminalContent');
+            const cursor = terminal.querySelector('.cursor');
+            
+            if (cursor) cursor.remove();
+            
+            const textDiv = document.createElement('div');
+            terminal.appendChild(textDiv);
+            
+            let i = 0;
+            const typeInterval = setInterval(() => {
+                textDiv.textContent += text[i];
+                i++;
+                if (i >= text.length) {
+                    clearInterval(typeInterval);
+                    const newCursor = document.createElement('span');
+                    newCursor.className = 'cursor';
+                    terminal.appendChild(newCursor);
+                    terminal.scrollTop = terminal.scrollHeight;
+                    if (callback) callback();
+                }
+            }, 30);
+        }
+
+        // Unit conversion
+        function convertToMph(speed, unit) {
+            switch(unit) {
+                case 'mph': return speed;
+                case 'kph': return speed * 0.621371;
+                case 'ms': return speed * 2.23694;
+                default: return speed;
+            }
+        }
+
+        function convertFromMph(speed, unit) {
+            switch(unit) {
+                case 'mph': return speed;
+                case 'kph': return speed / 0.621371;
+                case 'ms': return speed / 2.23694;
+                default: return speed;
+            }
+        }
+
+        // Set speed from preset buttons
+        function setSpeed(speed) {
+            document.getElementById('speedInput').value = speed;
+            currentSpeed = speed;
+            playSound('beep');
+            typeText(`SPEED SET TO ${speed} ${currentUnit.toUpperCase()}`);
+        }
+
+        // Unit selector
+        function selectUnit(unit) {
+            currentUnit = unit;
+            document.querySelectorAll('.unit-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            playSound('beep');
+            typeText(`UNIT CHANGED TO ${unit.toUpperCase()}`);
+        }
+
+        // Calculate speed on planet
+        function calculateSpeedOnPlanet(earthSpeed, planetGravity) {
+            // Speed is inversely proportional to gravity
+            // Lower gravity = faster speed, higher gravity = slower speed
+            return earthSpeed / Math.sqrt(planetGravity);
+        }
+
+        // Format speed display
+        function formatSpeed(speed, unit) {
+            return `${speed.toFixed(2)} ${unit.toUpperCase()}`;
+        }
+
+        // Create planet gallery
+        function createPlanetGallery() {
+            const planetsGrid = document.getElementById('planetsGrid');
+            
+            planets.forEach((planet, index) => {
+                const planetContainer = document.createElement('div');
+                planetContainer.className = 'planet-container';
+                planetContainer.setAttribute('data-planet', planet.name.toLowerCase());
+                
+                planetContainer.innerHTML = `
+                    <div class="planet ${planet.cssClass}"></div>
+                    <div class="planet-info">
+                        <div class="planet-name">${planet.emoji} ${planet.name}</div>
+                        <div class="planet-gravity">Gravity: ${planet.gravity}g</div>
+                        <div class="planet-fact">${planet.fact}</div>
+                    </div>
+                    <div class="speed-result" id="result-${index}"></div>
+                `;
+                
+                // Add click event listener
+                planetContainer.addEventListener('click', () => {
+                    calculateAndDisplaySpeed(planet, index);
+                });
+                
+                planetsGrid.appendChild(planetContainer);
+            });
+        }
+
+        // Calculate and display speed for clicked planet
+        function calculateAndDisplaySpeed(planet, index) {
+            const speedInput = document.getElementById('speedInput');
+            const inputSpeed = parseFloat(speedInput.value);
+            
+            if (!inputSpeed || inputSpeed <= 0) {
+                showError('Please enter a valid speed first!');
+                return;
+            }
+            
+            // Clear previous active states
+            document.querySelectorAll('.planet-container').forEach(container => {
+                container.classList.remove('active');
+            });
+            
+            // Hide all previous results
+            document.querySelectorAll('.speed-result').forEach(result => {
+                result.classList.remove('show');
+            });
+            
+            // Set current planet as active
+            const planetContainer = document.querySelector(`[data-planet="${planet.name.toLowerCase()}"]`);
+            planetContainer.classList.add('active');
+            
+            // Convert input speed to mph for calculation
+            const speedInMph = convertToMph(inputSpeed, currentUnit);
+            
+            // Calculate speed on this planet
+            const planetSpeed = calculateSpeedOnPlanet(speedInMph, planet.gravity);
+            
+            // Convert back to current unit for display
+            const displaySpeed = convertFromMph(planetSpeed, currentUnit);
+            
+            // Show result
+            const resultElement = document.getElementById(`result-${index}`);
+            resultElement.textContent = formatSpeed(displaySpeed, currentUnit);
+            resultElement.classList.add('show');
+            
+            // Play sound and update terminal
+            playSound('planet');
+            typeText(`PLANET ${planet.name.toUpperCase()} SELECTED`);
+            typeText(`YOUR SPEED: ${formatSpeed(displaySpeed, currentUnit)}`);
+            
+            // Add some fun commentary based on speed difference
+            const speedRatio = planetSpeed / speedInMph;
+            let commentary = '';
+            
+            if (speedRatio > 2) {
+                commentary = 'SUPERHUMAN SPEED ACHIEVED!';
+            } else if (speedRatio > 1.5) {
+                commentary = 'INCREDIBLE BOOST!';
+            } else if (speedRatio > 1.1) {
+                commentary = 'NICE SPEED INCREASE!';
+            } else if (speedRatio > 0.9) {
+                commentary = 'SIMILAR TO EARTH SPEED';
+            } else if (speedRatio > 0.5) {
+                commentary = 'GRAVITY IS SLOWING YOU DOWN';
+            } else {
+                commentary = 'HEAVY GRAVITY ZONE!';
+            }
+            
+            typeText(commentary);
+        }
+
+        // Show error message
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            playSound('error');
+            typeText(`ERROR: ${message}`);
+            
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        // Random speed test
+        function randomSpeedTest() {
+            const randomSpeed = Math.random() * 50 + 5; // Random speed between 5-55
+            const randomUnit = ['mph', 'kph', 'ms'][Math.floor(Math.random() * 3)];
+            
+            // Set random unit
+            currentUnit = randomUnit;
+            document.querySelectorAll('.unit-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.toLowerCase() === randomUnit) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Set random speed
+            document.getElementById('speedInput').value = randomSpeed.toFixed(1);
+            currentSpeed = randomSpeed;
+            
+            // Pick random planet
+            const randomPlanet = planets[Math.floor(Math.random() * planets.length)];
+            const planetIndex = planets.indexOf(randomPlanet);
+            
+            playSound('beep');
+            typeText(`RANDOM TEST INITIATED`);
+            typeText(`SPEED: ${randomSpeed.toFixed(1)} ${randomUnit.toUpperCase()}`);
+            typeText(`PLANET: ${randomPlanet.name.toUpperCase()}`);
+            
+            // Calculate and display after a short delay
+            setTimeout(() => {
+                calculateAndDisplaySpeed(randomPlanet, planetIndex);
+            }, 1000);
+        }
+
+        // Initialize the game
+        function initializeGame() {
+            createStars();
+            createPlanetGallery();
+            
+            // Set up event listeners
+            document.getElementById('randomBtn').addEventListener('click', randomSpeedTest);
+            
+            // Handle enter key in speed input
+            document.getElementById('speedInput').addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    const speed = parseFloat(this.value);
+                    if (speed && speed > 0) {
+                        currentSpeed = speed;
+                        playSound('confirm');
+                        typeText(`SPEED CONFIRMED: ${formatSpeed(speed, currentUnit)}`);
+                        typeText('CLICK ANY PLANET TO TEST YOUR SPEED!');
+                    } else {
+                        showError('Please enter a valid speed value');
+                    }
+                }
+            });
+            
+            // Initial terminal messages
+            setTimeout(() => {
+                typeText('3D PLANET RENDERER LOADED');
+            }, 1000);
+            
+            setTimeout(() => {
+                typeText('READY FOR SPEED CALCULATIONS');
+            }, 2000);
+            
+            setTimeout(() => {
+                typeText('SELECT A PLANET TO BEGIN!');
+            }, 3000);
+        }
+
+        // Start the game when page loads
+        window.addEventListener('load', initializeGame);
+    </script>
+</body>
+</html>
