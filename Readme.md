@@ -95,8 +95,8 @@ AstroMachine is not just another space website—it's a **fully interactive, vis
 
   
    ![ISRO Timeline Screenshot1](screenshots/8.png)  
-   
-    
+
+
    ![ISRO Timeline Screenshot2](screenshots/9.png)   
 
 ### 6. **General Features**
@@ -110,7 +110,7 @@ AstroMachine is not just another space website—it's a **fully interactive, vis
 ## Screenshots
 
 Below are some screenshots to showcase the unique look and feel of AstroMachine.  
-**(Replace the placeholder image paths with your actual screenshots!)**
+
 
 - Space Time Machine  
   ![Space Time Machine Screenshot](screenshots/10.png)
