@@ -24,7 +24,7 @@ Live Demo: https://heramb-acharya.github.io/AstroMachine/
    - This project is fully client-side and does **not** require Node.js, npm, or any build tools.
 
 4. **Run Locally**
-   - Open any of the main HTML files (`index.html`, `speedlab.html`, `solar-system.html`, `game.html`) directly in your web browser.
+   - Open any of the main HTML files (`index.html`, `speedlab.html`, `solar-system.html`, `game.html`, `isrotimeline.html`) directly in your web browser.
    - For best results, use a modern browser like Chrome, Firefox, or Edge.
 
 5. **Optional: Local Server**
