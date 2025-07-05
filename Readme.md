@@ -50,6 +50,8 @@ AstroMachine is not just another space website—it's a **fully interactive, vis
 
    
    ![Space Time Machine Screenshot1](screenshots/1.png)
+
+
    ![Space Time Machine Screenshot2](screenshots/2.png)
 
 ### 2. **Planet Speed Lab**
@@ -59,6 +61,8 @@ AstroMachine is not just another space website—it's a **fully interactive, vis
    
 
    ![Planet Speed Lab Screenshot1](screenshots/3.png)
+
+
    ![Planet Speed Lab Screenshot2](screenshots/4.png)
 
 ### 3. **Solar System Explorer**
@@ -69,6 +73,8 @@ AstroMachine is not just another space website—it's a **fully interactive, vis
 
    
    ![Solar System Explorer Screenshot1](screenshots/5.png)
+
+
    ![Solar System Explorer Screenshot2](screenshots/6.png)
 
 ### 4. **Space Invaders Game**
@@ -88,7 +94,9 @@ AstroMachine is not just another space website—it's a **fully interactive, vis
    - **Animated timeline:** Each mission appears with smooth animations and glowing effects for an engaging experience.
 
   
-   ![ISRO Timeline Screenshot1](screenshots/8.png)   
+   ![ISRO Timeline Screenshot1](screenshots/8.png)  
+   
+    
    ![ISRO Timeline Screenshot2](screenshots/9.png)   
 
 ### 6. **General Features**
