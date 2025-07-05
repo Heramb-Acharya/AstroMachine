@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstroMachine - ISRO Mission Archive</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:wght@400;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: #00ff00;
+            font-family: 'Courier Prime', monospace;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* Navigation */
+        .nav-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            background: rgba(0, 17, 0, 0.95);
+            border-bottom: 2px solid #00ff00;
+            padding: 15px 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #00ff00;
+            text-shadow: 0 0 10px #00ff00;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-item {
+            cursor: pointer;
+            padding: 10px 15px;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            font-size: 14px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            border: 1px solid #00ff00;
+            background: rgba(0, 255, 0, 0.1);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            gap: 3px;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: #00ff00;
+            transition: 0.3s;
+        }
+
+        .mission-control {
+            position: relative;
+            z-index: 10;
+            padding: 20px;
+            min-height: 100vh;
+            padding-top: 100px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border: 2px solid #00ff00;
+            padding: 30px;
+            background: rgba(0, 17, 0, 0.8);
+            box-shadow: 0 0 30px #00ff00;
+        }
+
+        .header h1 {
+            font-size: 3em;
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px #00ff00;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        .header .subtitle {
+            font-size: 1.2em;
+            color: #ffff00;
+            margin-bottom: 15px;
+        }
+
+        .header .description {
+            font-size: 1em;
+            color: #00ff00;
+            opacity: 0.9;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px #00ff00; }
+            to { text-shadow: 0 0 20px #00ff00, 0 0 30px #00ff00; }
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: rgba(0, 34, 0, 0.6);
+            border: 1px solid #00ff00;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-light {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00ff00;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+
+        .filter-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            background: rgba(0, 34, 0, 0.8);
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            font-family: 'Courier Prime', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: rgba(0, 255, 0, 0.2);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3);
+        }
+
+        .timeline-container {
+            position: relative;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px 0;
+        }
+
+        .timeline {
+            position: relative;
+            padding: 0 20px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(to bottom, #00ff00, #ffff00, #00ff00);
+            box-shadow: 0 0 15px #00ff00;
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 50px;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        .timeline-item:nth-child(odd) {
+            text-align: right;
+            padding-right: 60%;
+        }
+
+        .timeline-item:nth-child(even) {
+            text-align: left;
+            padding-left: 60%;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #00ff00;
+            border: 4px solid #000;
+            border-radius: 50%;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 20px #00ff00;
+            z-index: 5;
+        }
+
+        .landmark::before {
+            width: 30px;
+            height: 30px;
+            background: #ffff00;
+            border: 4px solid #ff8800;
+            animation: landmark-pulse 2s infinite;
+        }
+
+        @keyframes landmark-pulse {
+            0%, 100% { 
+                transform: translateX(-50%) scale(1);
+                box-shadow: 0 0 20px #ffff00;
+            }
+            50% { 
+                transform: translateX(-50%) scale(1.2);
+                box-shadow: 0 0 30px #ffff00, 0 0 40px #ff8800;
+            }
+        }
+
+        .mission-card {
+            background: rgba(0, 17, 0, 0.9);
+            border: 2px solid #00ff00;
+            padding: 25px;
+            border-radius: 10px;
+            position: relative;
+            transition: all 0.3s;
+            backdrop-filter: blur(5px);
+        }
+
+        .mission-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 255, 0, 0.2);
+        }
+
+        .landmark .mission-card {
+            border: 2px solid #ffff00;
+            background: rgba(17, 17, 0, 0.9);
+            box-shadow: 0 0 30px rgba(255, 255, 0, 0.3);
+        }
+
+        .landmark .mission-card::before {
+            content: '⭐ LANDMARK MISSION ⭐';
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ffff00;
+            color: #000;
+            padding: 5px 15px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 15px;
+            animation: glow-landmark 2s infinite;
+        }
+
+        @keyframes glow-landmark {
+            0%, 100% { box-shadow: 0 0 10px #ffff00; }
+            50% { box-shadow: 0 0 20px #ffff00, 0 0 30px #ff8800; }
+        }
+
+        .mission-date {
+            font-size: 16px;
+            color: #ffff00;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .mission-title {
+            font-size: 20px;
+            color: #00ffff;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .mission-type {
+            font-size: 12px;
+            color: #ff8800;
+            background: rgba(255, 136, 0, 0.1);
+            padding: 3px 8px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-bottom: 10px;
+            border: 1px solid #ff8800;
+        }
+
+        .mission-description {
+            color: #00ff00;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .mission-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .status-success {
+            color: #00ff00;
+        }
+
+        .status-ongoing {
+            color: #ffff00;
+        }
+
+        .status-planned {
+            color: #00ffff;
+        }
+
+        .mission-stats {
+            display: flex;
+            gap: 20px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            font-size: 12px;
+            color: #888;
+        }
+
+        .stat-value {
+            color: #00ff00;
+            font-weight: bold;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .timeline-item:nth-child(1) { animation-delay: 0.1s; }
+        .timeline-item:nth-child(2) { animation-delay: 0.2s; }
+        .timeline-item:nth-child(3) { animation-delay: 0.3s; }
+        .timeline-item:nth-child(4) { animation-delay: 0.4s; }
+        .timeline-item:nth-child(5) { animation-delay: 0.5s; }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(0, 17, 0, 0.98);
+                flex-direction: column;
+                padding: 20px;
+                border-top: 2px solid #00ff00;
+            }
+
+            .nav-menu.active {
+                display: flex;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+
+            .timeline::before {
+                left: 20px;
+            }
+
+            .timeline-item {
+                padding-left: 60px !important;
+                padding-right: 20px !important;
+                text-align: left !important;
+            }
+
+            .timeline-item::before {
+                left: 20px !important;
+                transform: translateX(-50%) !important;
+            }
+
+            .filter-controls {
+                gap: 10px;
+            }
+
+            .filter-btn {
+                padding: 8px 15px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="stars" id="stars"></div>
+    
+    <!-- Navigation -->
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <div class="nav-logo">🚀 ASTROMACHINE</div>
+            <ul class="nav-menu" id="navMenu">
+                <li><a href="index.html" class="nav-item">Time Machine</a></li>
+                <li><a href="speedlab.html" class="nav-item">Speed Lab</a></li>
+                <li><a href="game.html" class="nav-item">Space Game</a></li>
+                <li><a href="isrotimeline.html" class="nav-item active">Space Missions</a></li>
+                <li><a href="solar-system.html" class="nav-item">Solar System</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <div class="mission-control">
+        <div class="header">
+            <h1>🛰️ ISRO MISSION ARCHIVE 🛰️</h1>
+            
+            <p class="description">Journey through India's remarkable space exploration history. From humble beginnings to Mars and the Moon - witness the evolution of Indian space technology.</p>
+        </div>
+
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="status-light"></div>
+                <span>MISSION DATABASE: ONLINE</span>
+            </div>
+            <div class="status-item">
+                <div class="status-light"></div>
+                <span>SATELLITES LAUNCHED: 400+</span>
+            </div>
+            <div class="status-item">
+                <div class="status-light"></div>
+                <span>COUNTRIES SERVED: 30+</span>
+            </div>
+            <div class="status-item">
+                <div class="status-light"></div>
+                <span>TIMELINE: 1975-2024</span>
+            </div>
+        </div>
+
+        <div class="filter-controls">
+            <button class="filter-btn active" data-filter="all">All Missions</button>
+            <button class="filter-btn" data-filter="launch-vehicles">Launch Vehicles</button>
+            <button class="filter-btn" data-filter="lunar">Lunar Missions</button>
+            <button class="filter-btn" data-filter="planetary">Planetary Missions</button>
+            <button class="filter-btn" data-filter="earth-observation">Earth Observation</button>
+            <button class="filter-btn" data-filter="communication">Communication</button>
+        </div>
+
+        <div class="timeline-container">
+            <div class="timeline" id="timeline">
+                
+                <!-- 1975 - Aryabhata -->
+                <div class="timeline-item landmark" data-category="communication">
+                    <div class="mission-card">
+                        <div class="mission-date">April 19, 1975</div>
+                        <div class="mission-title">Aryabhata</div>
+                        <div class="mission-type">FIRST SATELLITE</div>
+                        <div class="mission-description">India's first satellite, named after the ancient mathematician. Launched by the Soviet Union, it marked India's entry into the space age.</div>
+                        <div class="mission-status">
+                            <div class="status-light"></div>
+                            <span class="status-success">MISSION COMPLETED</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 1980 - SLV-3 -->
+                <div class="timeline-item landmark" data-category="launch-vehicles">
+                    <div class="mission-card">
+                        <div class="mission-date">July 18, 1980</div>
+                        <div class="mission-title">SLV-3 First Success</div>
+                        <div class="mission-type">INDIGENOUS LAUNCH</div>
+                        <div class="mission-description">India's first indigenous satellite launch vehicle successfully placed Rohini satellite in orbit. Led by Dr. A.P.J. Abdul Kalam.</div>
+                        <div class="mission-status">
+                            <div class="status-light"></div>
+                            <span class="status-success">MISSION SUCCESS</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 1988 - IRS-1A -->
+                <div class="timeline-item" data-category="earth-observation">
+                    <div class="mission-card">
+                        <div class="mission-date">March 17, 1988</div>
+                        <div class="mission-title">IRS-1A</div>
+                        <div class="mission-type">REMOTE SENSING</div>
+                        <div class="mission-description">First operational remote sensing satellite of India, beginning the Indian Remote Sensing satellite series.</div>
+                        <div class="mission-status">
+                            <div class="status-light"></div>
+                            <span class="status-success">MISSION COMPLETED</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 1993 - PSLV-C1 -->
+                <div class="timeline-item" data-category="launch-vehicles">
+                    <div class="mission-card">
+                        <div class="mission-date">September 20, 1993</div>
+                        <div class="mission-title">PSLV-C1 First Flight</div>
+                        <div class="mission-type">LAUNCH VEHICLE</div>
+                        <div class="mission-description">Maiden flight of PSLV (Polar Satellite Launch Vehicle), India's workhorse rocket that would revolutionize satellite deployment.</div>
+                        <div class="mission-status">
+                            <div class="status-light"></div>
+                            <span class="status-success">PARTIAL SUCCESS</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2008 - Chandrayaan-1 -->
+                <div class="timeline-item landmark" data-category="lunar">
+                    <div class="mission-card">
+                        <div class="mission-date">October 22, 2008</div>
+                        <div class="mission-title">Chandrayaan-1</div>
+                        <div class="mission-type">LUNAR EXPLORATION</div>
+                        <div class="mission-description">India's first lunar probe discovered water molecules on the Moon's surface, making global headlines and establishing India as a space power.</div>
+                        <div class="mission-status">
+                            <div class="status-light"></div>
+                            <span class="status-success">MISSION SUCCESS</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2013 - Mangalyaan -->
+                <div class="timeline-item landmark" data-category="planetary">
+                    <div class="mission-card">
+                        <div class="mission-date">November 5, 2013</div>
+                        <div class="mission-title">Mars Orbiter Mission (Mangalyaan)</div>
+                        <div class="mission-type">MARS EXPLORATION</div>
+                        <div class="mission-description">India became the first nation to reach Mars orbit in its first attempt, and the most cost-effective Mars mission ever at $74 million.</div>
+                        <div class="mission-status">
+                            <div class="status-light"></div>
+                            <span class="status-success">MISSION SUCCESS</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2017 - PSLV-C37 -->
+                <div class="timeline-item landmark" data-category="launch-vehicles">
+                    <div class="mission-card">
+                        <div class="mission-date">February 15, 2017</div>
+                        <div class="mission-title">PSLV-C37 (104 Satellites)</div>
+                        <div class="mission-type">WORLD RECORD</div>
+                        <div class="mission-description">ISRO set a world record by launching 104 satellites in a single mission, showcasing India's commercial space capabilities.</div>
+                        <div class="mission-status">
+                            <div class="status-light"></div>
+                            <span class="status-success">WORLD RECORD</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2017 - GSLV Mk III -->
+                <div class="timeline-item" data-category="launch-vehicles">
+                    <div class="mission-card">
+                        <div class="mission-date">June 5, 2017</div>
+                        <div class="mission-title">GSLV Mk III-D1</div>
+                        <div class="mission-type">HEAVY LIFT ROCKET</div>
+                        <div class="mission-description">India's heaviest rocket successfully launched GSAT-19, demonstrating capability to launch 4-ton satellites to geostationary orbit.</div>
+                        <div class="mission-status">
+                            <div class="status-light"></div>
+                            <span class="status-success">MISSION SUCCESS</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2019 - Chandrayaan-2 -->
+                <div class="timeline-item" data-category="lunar">
+                    <div class="mission-card">
+                        <div class="mission-date">July 22, 2019</div>
+                        <div class="mission-title">Chandrayaan-2</div>
+                        <div class="mission-type">LUNAR EXPLORATION</div>
+                        <div class="mission-description">India's second lunar mission with orbiter, lander, and rover. Though the lander faced challenges, the orbiter continues providing valuable data.</div>
+                        <div class="mission-status">
+                            <div class="status-light"></div>
+                            <span class="status-ongoing">ORBITER OPERATIONAL</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2023 - Chandrayaan-3 -->
+                <div class="timeline-item landmark" data-category="lunar">
+                    <div class="mission-card">
+                        <div class="mission-date">July 14, 2023</div>
+                        <div class="mission-title">Chandrayaan-3</div>
+                        <div class="mission-type">MOON LANDING</div>
+                        <div class="mission-description">Historic success! India became the first nation to land near the Moon's south pole, making India the 4th country to achieve a soft lunar landing.</div>
+                        <div class="mission-status">
+                            <div class="status-light"></div>
+                            <span class="status-success">HISTORIC SUCCESS</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2023 - Aditya-L1 -->
+                <div class="timeline-item" data-category="planetary">
+                    <div class="mission-card">
+                        <div class="mission-date">September 2, 2023</div>
+                        <div class="mission-title">Aditya-L1</div>
+                        <div class="mission-type">SOLAR OBSERVATORY</div>
+                        <div class="mission-description">India's first solar observatory mission, positioned at L1 Lagrange point to study the Sun's corona and solar wind.</div>
+                        <div class="mission-status">
+                            <div class="status-light"></div>
+                            <span class="status-ongoing">MISSION ONGOING</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2024 - Upcoming -->
+                <div class="timeline-item" data-category="planetary">
+                    <div class="mission-card">
+                        <div class="mission-date">2024-2025</div>
+                        <div class="mission-title">Gaganyaan</div>
+                        <div class="mission-type">HUMAN SPACEFLIGHT</div>
+                        <div class="mission-description">India's first crewed space mission, aiming to send Indian astronauts to space and establish India as a human spaceflight nation.</div>
+                        <div class="mission-status">
+                            <div class="status-light"></div>
+                            <span class="status-planned">IN DEVELOPMENT</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Create starfield
+        function createStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 150; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        // Navigation hamburger menu
+        document.getElementById('hamburger').addEventListener('click', function() {
+            const navMenu = document.getElementById('navMenu');
+            navMenu.classList.toggle('active');
+        });
+
+        // Filter functionality
+        function initializeFilters() {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const timelineItems = document.querySelectorAll('.timeline-item');
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Remove active class from all buttons
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    // Add active class to clicked button
+                    this.classList.add('active');
+
+                    const filterValue = this.dataset.filter;
+
+                    timelineItems.forEach(item => {
+                        if (filterValue === 'all' || item.dataset.category === filterValue) {
+                            item.style.display = 'block';
+                            item.style.animation = 'none';
+                            // Trigger reflow
+                            item.offsetHeight;
+                            item.style.animation = 'fadeInUp 0.8s ease-out forwards';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    });
+                });
+            });
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            createStars();
+            initializeFilters();
+            
+            // Add scroll-triggered animations
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            });
+
+            document.querySelectorAll('.timeline-item').forEach(item => {
+                observer.observe(item);
+            });
+        });
+    </script>
+</body>
+</html>
