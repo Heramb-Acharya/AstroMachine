@@ -728,14 +728,14 @@ const spaceEvents = {
 
 
         function validateDateRange(date) {
-        const minDate = new Date(1957, 9, 4); // Sputnik launch
-        const maxDate = new Date();
-        
-        if (date < minDate || date > maxDate) {
-            return false; 
-        }
-        return true;
-        }
+    const minDate = new Date(1957, 9, 4); // Sputnik launch
+    // Remove the maxDate check to allow future dates
+    
+    if (date < minDate) {
+        return false; 
+    }
+    return true;
+}
 
         // Time jump function
         function initiateTimeJump() {
